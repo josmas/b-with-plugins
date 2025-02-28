@@ -5,11 +5,12 @@
  */
 
 import * as Blockly from 'blockly';
-import {blocks} from './blocks/text';
-import {forBlock} from './generators/javascript';
-import {javascriptGenerator} from 'blockly/javascript';
-import {save, load} from './serialization';
-import {toolbox} from './toolbox';
+import { blocks } from './blocks/text';
+import { forBlock } from './generators/javascript';
+import { javascriptGenerator } from 'blockly/javascript';
+import { save, load } from './serialization';
+import { toolbox } from './toolbox';
+import { NavigationController } from '@blockly/keyboard-navigation';
 import './index.css';
 
 // Register the blocks and generator with Blockly
@@ -24,7 +25,12 @@ const blocklyDiv = document.getElementById('blocklyDiv');
 if (!blocklyDiv) {
   throw new Error(`div with id 'blocklyDiv' not found`);
 }
-const ws = Blockly.inject(blocklyDiv, {toolbox});
+
+const ws = Blockly.inject(blocklyDiv, { toolbox, comments: true, renderer: 'zelos', zoom: { controls: true } });
+
+const navigationController = new NavigationController();
+navigationController.init();
+navigationController.addWorkspace(ws)
 
 // This function resets the code and output divs, shows the
 // generated code from the workspace, and evals the code.
