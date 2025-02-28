@@ -617,7 +617,7 @@ export const toolbox = {
       kind: 'category',
       name: 'Variables',
       categorystyle: 'variable_category',
-      custom: 'VARIABLE',
+      custom: 'VARIABLE_DYNAMIC',
     },
     {
       kind: 'category',
