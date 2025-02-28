@@ -1,5 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
 
 // Base config that applies to either development or production mode.
 const config = {
@@ -30,6 +31,9 @@ const config = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
+    fallback: {
+      util: require.resolve("util/")
+    }
   },
   plugins: [
     // Generate the HTML index page based on our template.
@@ -37,6 +41,9 @@ const config = {
     // created above added in a script tag.
     new HtmlWebpackPlugin({
       template: 'src/index.html',
+    }),
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
     }),
   ],
 };
