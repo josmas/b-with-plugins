@@ -29,6 +29,7 @@
     "@blockly/keyboard-experiment": "^0.0.3",
     "@blockly/keyboard-navigation": "^0.6.12",
     "@blockly/workspace-minimap": "^0.2.12",
+    "@mit-app-inventor/blockly-plugin-workspace-multiselect": "^1.0.1",
     "blockly": "^11.0.0"
   }
 }

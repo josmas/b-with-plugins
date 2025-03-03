@@ -12,6 +12,7 @@ import { save, load } from './serialization';
 import { toolbox } from './toolbox';
 import { NavigationController } from '@blockly/keyboard-navigation';
 import { Minimap } from '@blockly/workspace-minimap';
+import { Multiselect } from '@mit-app-inventor/blockly-plugin-workspace-multiselect'
 
 import './index.css';
 
@@ -28,7 +29,32 @@ if (!blocklyDiv) {
   throw new Error(`div with id 'blocklyDiv' not found`);
 }
 
-const ws = Blockly.inject(blocklyDiv, { toolbox, comments: true, renderer: 'zelos', zoom: { controls: true } });
+const bOptions = {
+  toolbox: toolbox,
+  comments: true,
+  renderer: 'zelos',
+  zoom: { controls: true },
+  // For multi-select plugin
+  useDoubleClick: true,
+  bumpNeighbours: false,
+  multiFiledUpdate: true,
+  workspaceAutoFocus: true,
+  multiselectIcon: {
+    hideIcon: false,
+    weight: 3,
+    enabledIcon: 'https://github.com/mit-cml/workspace-multiselect/raw/main/test/media/select.svg',
+    disabledIcon: 'https://github.com/mit-cml/workspace-multiselect/raw/main/test/media/unselect.svg',
+  },
+  multiSelectKeys: ['Shift'],
+
+  multiselectCopyPaste: {
+    // Enable the copy/paste accross tabs feature (true by default).
+    crossTab: true,
+    // Show the copy/paste menu entries (true by default).
+    menu: true,
+  },
+}
+const ws = Blockly.inject(blocklyDiv, bOptions);
 
 function setupPlugins(workspace: Blockly.WorkspaceSvg) {
   // Add the keyboard navigation plugin to the workspace.
@@ -36,9 +62,12 @@ function setupPlugins(workspace: Blockly.WorkspaceSvg) {
   navigationController.init();
   navigationController.addWorkspace(workspace);
 
-  // Add the minimap plugin to the workspace.
-  const miniMap = new Minimap(workspace);
-  miniMap.init();
+  // NOTE: Commenting out minimap cause it breaks other functionality such as collapsing blocks 
+  // const miniMap = new Minimap(workspace);
+  // miniMap.init();
+
+  const multiselect = new Multiselect(workspace);
+  multiselect.init(bOptions);
 }
 
 // This function resets the code and output divs, shows the
