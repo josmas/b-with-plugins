@@ -11,6 +11,8 @@ import { javascriptGenerator } from 'blockly/javascript';
 import { save, load } from './serialization';
 import { toolbox } from './toolbox';
 import { NavigationController } from '@blockly/keyboard-navigation';
+import { Minimap } from '@blockly/workspace-minimap';
+
 import './index.css';
 
 // Register the blocks and generator with Blockly
@@ -31,6 +33,9 @@ const ws = Blockly.inject(blocklyDiv, { toolbox, comments: true, renderer: 'zelo
 const navigationController = new NavigationController();
 navigationController.init();
 navigationController.addWorkspace(ws)
+
+const miniMap = new Minimap(ws);
+miniMap.init();
 
 // This function resets the code and output divs, shows the
 // generated code from the workspace, and evals the code.
