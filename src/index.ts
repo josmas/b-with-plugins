@@ -30,12 +30,16 @@ if (!blocklyDiv) {
 
 const ws = Blockly.inject(blocklyDiv, { toolbox, comments: true, renderer: 'zelos', zoom: { controls: true } });
 
-const navigationController = new NavigationController();
-navigationController.init();
-navigationController.addWorkspace(ws)
+function setupPlugins(workspace: Blockly.WorkspaceSvg) {
+  // Add the keyboard navigation plugin to the workspace.
+  const navigationController = new NavigationController();
+  navigationController.init();
+  navigationController.addWorkspace(workspace);
 
-const miniMap = new Minimap(ws);
-miniMap.init();
+  // Add the minimap plugin to the workspace.
+  const miniMap = new Minimap(workspace);
+  miniMap.init();
+}
 
 // This function resets the code and output divs, shows the
 // generated code from the workspace, and evals the code.
@@ -53,6 +57,7 @@ if (ws) {
   // Load the initial state from storage and run the code.
   load(ws);
   runCode();
+  setupPlugins(ws);
 
   // Every time the workspace changes state, save the changes to storage.
   ws.addChangeListener((e: Blockly.Events.Abstract) => {
