@@ -28,7 +28,6 @@ if (!blocklyDiv) {
   throw new Error(`div with id 'blocklyDiv' not found`);
 }
 
-// const ws = Blockly.inject(blocklyDiv, { toolbox, comments: true, renderer: 'zelos', zoom: { controls: true } });
 let ws: Blockly.WorkspaceSvg;
 
 const navigationController = new NavigationController();
@@ -70,9 +69,6 @@ function createWorkspace(blocklyDiv: Element | string, options: BlocklyOptions) 
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  const defaultOptions = {
-    toolbox,
-  };
   createPlayground(
       document.getElementById('blocklyDiv'),
       createWorkspace,
