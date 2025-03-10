@@ -36,6 +36,8 @@ function createWorkspace(blocklyDiv: Element | string, options: BlocklyOptions) 
   ws = Blockly.inject(blocklyDiv, options);
   navigationController.init();
   navigationController.addWorkspace(ws);
+  // Uncomment the following line to enable keyboard navigation by default. Otherwise,
+  // you need to use Ctlr+Shift+K to enable it.
   // navigationController.enable(ws);
   if (ws) {
     // Load the initial state from storage and run the code.
