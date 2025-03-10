@@ -13,6 +13,7 @@ import { toolbox } from './toolbox';
 import { NavigationController } from '@blockly/keyboard-navigation';
 import { createPlayground } from '@blockly/dev-tools';
 import './index.css';
+import {BlocklyOptions} from "blockly";
 
 // Register the blocks and generator with Blockly
 Blockly.common.defineBlocks(blocks);
@@ -27,21 +28,55 @@ if (!blocklyDiv) {
   throw new Error(`div with id 'blocklyDiv' not found`);
 }
 
-const ws = Blockly.inject(blocklyDiv, { toolbox, comments: true, renderer: 'zelos', zoom: { controls: true } });
+// const ws = Blockly.inject(blocklyDiv, { toolbox, comments: true, renderer: 'zelos', zoom: { controls: true } });
+let ws: Blockly.WorkspaceSvg;
 
 const navigationController = new NavigationController();
-navigationController.init();
-navigationController.addWorkspace(ws)
 
+function createWorkspace(blocklyDiv: Element | string, options: BlocklyOptions) {
+  ws = Blockly.inject(blocklyDiv, options);
+  navigationController.init();
+  navigationController.addWorkspace(ws);
+  // navigationController.enable(ws);
+  if (ws) {
+    // Load the initial state from storage and run the code.
+    load(ws);
+    runCode();
+
+    // Every time the workspace changes state, save the changes to storage.
+    ws.addChangeListener((e: Blockly.Events.Abstract) => {
+      // UI events are things like scrolling, zooming, etc.
+      // No need to save after one of these.
+      if (e.isUiEvent) return;
+      save(ws);
+    });
+
+    // Whenever the workspace changes meaningfully, run the code again.
+    ws.addChangeListener((e: Blockly.Events.Abstract) => {
+      // Don't run the code when the workspace finishes loading; we're
+      // already running it once when the application starts.
+      // Don't run the code during drags; we might have invalid state.
+      if (
+          e.isUiEvent ||
+          e.type == Blockly.Events.FINISHED_LOADING ||
+          ws.isDragging()
+      ) {
+        return;
+      }
+      runCode();
+    });
+  }
+  return ws;
+}
 
 document.addEventListener('DOMContentLoaded', function () {
   const defaultOptions = {
     toolbox,
   };
   createPlayground(
-    document.getElementById('root'),
-    ws,
-    defaultOptions,
+      document.getElementById('blocklyDiv'),
+      createWorkspace,
+      { toolbox, comments: true, renderer: 'zelos', zoom: { controls: true } },
   );
 });
 
@@ -57,31 +92,4 @@ const runCode = () => {
   eval(code);
 };
 
-if (ws) {
-  // Load the initial state from storage and run the code.
-  load(ws);
-  runCode();
 
-  // Every time the workspace changes state, save the changes to storage.
-  ws.addChangeListener((e: Blockly.Events.Abstract) => {
-    // UI events are things like scrolling, zooming, etc.
-    // No need to save after one of these.
-    if (e.isUiEvent) return;
-    save(ws);
-  });
-
-  // Whenever the workspace changes meaningfully, run the code again.
-  ws.addChangeListener((e: Blockly.Events.Abstract) => {
-    // Don't run the code when the workspace finishes loading; we're
-    // already running it once when the application starts.
-    // Don't run the code during drags; we might have invalid state.
-    if (
-      e.isUiEvent ||
-      e.type == Blockly.Events.FINISHED_LOADING ||
-      ws.isDragging()
-    ) {
-      return;
-    }
-    runCode();
-  });
-}
