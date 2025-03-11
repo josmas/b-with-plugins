@@ -13,7 +13,7 @@ import { toolbox } from './toolbox';
 import { NavigationController } from '@blockly/keyboard-navigation';
 import { createPlayground } from '@blockly/dev-tools';
 import './index.css';
-import {BlocklyOptions} from "blockly";
+import { BlocklyOptions } from "blockly";
 
 // Register the blocks and generator with Blockly
 Blockly.common.defineBlocks(blocks);
@@ -58,9 +58,9 @@ function createWorkspace(blocklyDiv: Element | string, options: BlocklyOptions) 
       // already running it once when the application starts.
       // Don't run the code during drags; we might have invalid state.
       if (
-          e.isUiEvent ||
-          e.type == Blockly.Events.FINISHED_LOADING ||
-          ws.isDragging()
+        e.isUiEvent ||
+        e.type == Blockly.Events.FINISHED_LOADING ||
+        ws.isDragging()
       ) {
         return;
       }
@@ -72,9 +72,9 @@ function createWorkspace(blocklyDiv: Element | string, options: BlocklyOptions) 
 
 document.addEventListener('DOMContentLoaded', function () {
   createPlayground(
-      document.getElementById('blocklyDiv'),
-      createWorkspace,
-      { toolbox, comments: true, renderer: 'zelos', zoom: { controls: true } },
+    blocklyDiv,
+    createWorkspace,
+    { toolbox, comments: true, renderer: 'zelos', zoom: { controls: true } },
   );
 });
 
