@@ -15,6 +15,7 @@
   "author": "",
   "license": "Apache-2.0",
   "devDependencies": {
+    "@blockly/dev-tools": "^8.0.12",
     "css-loader": "^6.7.1",
     "html-webpack-plugin": "^5.5.0",
     "source-map-loader": "^4.0.1",
@@ -30,6 +31,8 @@
     "@blockly/keyboard-navigation": "^0.6.12",
     "@blockly/workspace-minimap": "^0.2.12",
     "@mit-app-inventor/blockly-plugin-workspace-multiselect": "^1.0.1",
-    "blockly": "^11.0.0"
+    "blockly": "^11.0.0",
+    "process": "^0.11.10",
+    "util": "^0.12.5"
   }
 }

@@ -11,6 +11,8 @@ import { javascriptGenerator } from 'blockly/javascript';
 import { save, load } from './serialization';
 import { toolbox } from './toolbox';
 import { NavigationController } from '@blockly/keyboard-navigation';
+import { createPlayground } from '@blockly/dev-tools';
+import { BlocklyOptions } from "blockly";
 import { Minimap } from '@blockly/workspace-minimap';
 import { Multiselect } from '@mit-app-inventor/blockly-plugin-workspace-multiselect'
 
@@ -28,6 +30,8 @@ const blocklyDiv = document.getElementById('blocklyDiv');
 if (!blocklyDiv) {
   throw new Error(`div with id 'blocklyDiv' not found`);
 }
+
+let ws: Blockly.WorkspaceSvg;
 
 const bOptions = {
   toolbox: toolbox,
@@ -54,21 +58,63 @@ const bOptions = {
     menu: true,
   },
 }
-const ws = Blockly.inject(blocklyDiv, bOptions);
 
-function setupPlugins(workspace: Blockly.WorkspaceSvg) {
-  // Add the keyboard navigation plugin to the workspace.
-  const navigationController = new NavigationController();
+const navigationController = new NavigationController();
+
+function createWorkspace(blocklyDiv: Element | string, options: BlocklyOptions) {
+  console.log('WHAT IS OPTIONS', options);
+  ws = Blockly.inject(blocklyDiv, options);
   navigationController.init();
-  navigationController.addWorkspace(workspace);
+  navigationController.addWorkspace(ws);
+  // Uncomment the following line to enable keyboard navigation by default. Otherwise,
+  // you need to use Ctlr+Shift+K to enable it.
+  // navigationController.enable(ws);
 
   // NOTE: Commenting out minimap cause it breaks other functionality such as collapsing blocks 
   // const miniMap = new Minimap(workspace);
   // miniMap.init();
 
-  const multiselect = new Multiselect(workspace);
+  const multiselect = new Multiselect(ws);
   multiselect.init(bOptions);
+
+  if (ws) {
+    // Load the initial state from storage and run the code.
+    load(ws);
+    runCode();
+
+    // Every time the workspace changes state, save the changes to storage.
+    ws.addChangeListener((e: Blockly.Events.Abstract) => {
+      // UI events are things like scrolling, zooming, etc.
+      // No need to save after one of these.
+      if (e.isUiEvent) return;
+      save(ws);
+    });
+
+    // Whenever the workspace changes meaningfully, run the code again.
+    ws.addChangeListener((e: Blockly.Events.Abstract) => {
+      // Don't run the code when the workspace finishes loading; we're
+      // already running it once when the application starts.
+      // Don't run the code during drags; we might have invalid state.
+      if (
+        e.isUiEvent ||
+        e.type == Blockly.Events.FINISHED_LOADING ||
+        ws.isDragging()
+      ) {
+        return;
+      }
+      runCode();
+    });
+  }
+  return ws;
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+  createPlayground(
+    blocklyDiv,
+    createWorkspace,
+    bOptions,
+  );
+});
 
 // This function resets the code and output divs, shows the
 // generated code from the workspace, and evals the code.
@@ -82,32 +128,3 @@ const runCode = () => {
   eval(code);
 };
 
-if (ws) {
-  // Load the initial state from storage and run the code.
-  load(ws);
-  runCode();
-  setupPlugins(ws);
-
-  // Every time the workspace changes state, save the changes to storage.
-  ws.addChangeListener((e: Blockly.Events.Abstract) => {
-    // UI events are things like scrolling, zooming, etc.
-    // No need to save after one of these.
-    if (e.isUiEvent) return;
-    save(ws);
-  });
-
-  // Whenever the workspace changes meaningfully, run the code again.
-  ws.addChangeListener((e: Blockly.Events.Abstract) => {
-    // Don't run the code when the workspace finishes loading; we're
-    // already running it once when the application starts.
-    // Don't run the code during drags; we might have invalid state.
-    if (
-      e.isUiEvent ||
-      e.type == Blockly.Events.FINISHED_LOADING ||
-      ws.isDragging()
-    ) {
-      return;
-    }
-    runCode();
-  });
-}
